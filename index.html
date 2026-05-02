@@ -16,71 +16,73 @@ body {
   image-rendering: pixelated;
 }
 
-/* ===== LAYOUT ===== */
+/* layout */
 #game {
   width: 100vw;
   height: 100vh;
   position: relative;
 }
 
-/* SCORE (simple text only) */
+/* score */
 #score {
   position: absolute;
   top: 18px;
   left: 18px;
   font-size: 12px;
-  color: #000;
 }
 
-/* ===== PLANT CENTER ===== */
+/* CENTER PLANT (FIXED STRUCTURE) */
 #plant {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* BIG PIXEL TREE (fully visible now) */
+/* ===== PIXEL TREE ===== */
 #tree {
   width: 140px;
-  height: 180px;
-  margin: 0 auto;
+  height: 140px;
   position: relative;
-  transform-origin: bottom center;
 }
 
-/* trunk + leaves block */
-#tree::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 0;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 80px;
-  background: #8b5a2b;
+/* leaves block */
+.leaves {
+  width: 100px;
+  height: 70px;
+  background:
+    #7CFF8B;
+  margin: 0 auto;
   box-shadow:
-    -20px -25px 0 0 #7CFF8B,
-     20px -25px 0 0 #7CFF8B,
-      0px -50px 0 0 #7CFF8B,
-    -40px 0px 0 0 #7CFF8B,
-     40px 0px 0 0 #7CFF8B;
+    -40px 20px 0 #7CFF8B,
+     40px 20px 0 #7CFF8B,
+      0px 40px 0 #7CFF8B;
+}
+
+/* trunk (always centered under leaves now) */
+.trunk {
+  width: 18px;
+  height: 60px;
+  background: #8b5a2b;
+  margin: -10px auto 0;
 }
 
 /* pot */
 #pot {
   width: 90px;
   height: 40px;
-  margin: 8px auto 0;
   background: #d9a066;
   border: 3px solid #000;
+  margin-top: 6px;
 }
 
-/* ===== WATER BAR (closer to center) ===== */
+/* ===== WATER BAR ===== */
 #barWrap {
   position: absolute;
-  right: calc(50% - 240px); /* pulled toward center */
+  right: calc(50% - 240px);
   top: 50%;
   transform: translateY(-50%);
   width: 50px;
@@ -89,42 +91,28 @@ body {
   background: #fff;
 }
 
-/* danger zones */
 #barWrap::before,
 #barWrap::after {
   content: "";
   position: absolute;
-  left: 0;
   width: 100%;
   height: 20%;
+  left: 0;
   background: #ff4d4d;
 }
 
 #barWrap::before { top: 0; }
 #barWrap::after { bottom: 0; }
 
-/* fill */
 #barFill {
   position: absolute;
   bottom: 0;
   width: 100%;
   height: 50%;
   background: #3cc7ff;
-  transition: height 0.08s linear;
 }
 
-/* pixel overlay */
-#barGrid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(#000 1px, transparent 1px),
-    linear-gradient(90deg, #000 1px, transparent 1px);
-  background-size: 10px 10px;
-  opacity: 0.12;
-}
-
-/* ===== BUTTON (bottom center) ===== */
+/* button */
 #waterBtn {
   position: absolute;
   bottom: 30px;
@@ -132,17 +120,13 @@ body {
   transform: translateX(-50%);
   font-family: inherit;
   font-size: 10px;
-  padding: 14px 18px;
+  padding: 12px 16px;
   background: #fff;
   border: 3px solid #000;
   cursor: pointer;
 }
 
-#waterBtn:active {
-  transform: translateX(-50%) scale(0.96);
-}
-
-/* ===== GAME OVER ===== */
+/* game over */
 #gameOver {
   position: absolute;
   inset: 0;
@@ -154,28 +138,24 @@ body {
   color: #fff;
 }
 
-#restart {
-  margin-top: 20px;
-  padding: 10px;
-  font-family: inherit;
-  border: 3px solid #000;
-}
-
-/* ===== ANIMATIONS ===== */
+/* animations */
 @keyframes sway {
-  0% { transform: translate(-50%, -50%) rotate(-2deg); }
-  50% { transform: translate(-50%, -50%) rotate(2deg); }
-  100% { transform: translate(-50%, -50%) rotate(-2deg); }
+  0% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+  100% { transform: rotate(-2deg); }
 }
 
 @keyframes panic {
-  0% { transform: translate(-50%, -50%) rotate(-5deg); }
-  50% { transform: translate(-50%, -50%) rotate(5deg); }
-  100% { transform: translate(-50%, -50%) rotate(-5deg); }
+  0% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+  100% { transform: rotate(-6deg); }
 }
 
 .normal { animation: sway 2.5s infinite; }
-.stressed { animation: panic 0.35s infinite; }
+.stressed { animation: panic 0.3s infinite; }
+
+#tree.normal { transform-origin: bottom center; }
+#tree.stressed { transform-origin: bottom center; }
 </style>
 </head>
 
@@ -185,21 +165,23 @@ body {
   <div id="score">Score: 0</div>
 
   <div id="plant">
-    <div id="tree" class="normal"></div>
+    <div id="tree" class="normal">
+      <div class="leaves"></div>
+      <div class="trunk"></div>
+    </div>
     <div id="pot"></div>
   </div>
 
   <div id="barWrap">
     <div id="barFill"></div>
-    <div id="barGrid"></div>
   </div>
 
   <button id="waterBtn">WATER (SPACE)</button>
 
   <div id="gameOver">
-    <h1>💀 DEAD PLANT</h1>
+    <h1>💀 DEAD</h1>
     <div id="finalScore"></div>
-    <button id="restart">RESTART</button>
+    <button onclick="location.reload()">RESTART</button>
   </div>
 </div>
 
@@ -217,7 +199,7 @@ const finalScore = document.getElementById("finalScore");
 function update() {
   bar.style.height = water + "%";
 
-  if (water <= 20 || water >= 80) {
+  if (water < 20 || water > 80) {
     tree.classList.add("stressed");
     tree.classList.remove("normal");
   } else {
@@ -226,7 +208,9 @@ function update() {
   }
 
   if (water <= 0 || water >= 100) {
-    die();
+    alive = false;
+    gameOver.style.display = "flex";
+    finalScore.innerText = "Score: " + score;
   }
 }
 
@@ -237,27 +221,19 @@ function waterPlant() {
   update();
 }
 
-function die() {
-  alive = false;
-  gameOver.style.display = "flex";
-  finalScore.innerText = "Score: " + score;
-}
-
 document.getElementById("waterBtn").onclick = waterPlant;
 
 document.addEventListener("keydown", e => {
   if (e.code === "Space") waterPlant();
 });
 
-document.getElementById("restart").onclick = () => location.reload();
-
 setInterval(() => {
   if (!alive) return;
 
-  water -= 0.7 + Math.random() * 0.6;
+  water -= 0.8 + Math.random() * 0.6;
   score++;
-
   scoreEl.innerText = "Score: " + score;
+
   update();
 }, 120);
 
