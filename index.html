@@ -14,6 +14,22 @@ body {
   background: #ffd6ec;
   font-family: "Press Start 2P", monospace;
   image-rendering: pixelated;
+
+  <div id="plant">
+  <div id="succulent" class="normal">
+    <div class="leaf l1"></div>
+    <div class="leaf l2"></div>
+    <div class="leaf l3"></div>
+    <div class="leaf l4"></div>
+    <div class="leaf l5"></div>
+  </div>
+
+  <div id="pot">
+    <div class="eye left"></div>
+    <div class="eye right"></div>
+    <div class="mouth"></div>
+  </div>
+</div>
 }
 
 /* layout */
@@ -31,7 +47,7 @@ body {
   font-size: 12px;
 }
 
-/* CENTER PLANT (FIXED STRUCTURE) */
+/* CENTER PLANT */
 #plant {
   position: absolute;
   left: 50%;
@@ -42,41 +58,80 @@ body {
   align-items: center;
 }
 
-/* ===== PIXEL TREE ===== */
-#tree {
-  width: 140px;
-  height: 140px;
+/* ===== SUCCULENT ===== */
+#succulent {
   position: relative;
+  width: 160px;
+  height: 120px;
+  margin-bottom: -10px; /* overlap pot */
 }
 
-/* leaves block */
-.leaves {
-  width: 100px;
+/* leaves (big rosette, slightly bigger than pot) */
+.leaf {
+  position: absolute;
+  width: 70px;
   height: 70px;
-  background:
-    #7CFF8B;
-  margin: 0 auto;
-  box-shadow:
-    -40px 20px 0 #7CFF8B,
-     40px 20px 0 #7CFF8B,
-      0px 40px 0 #7CFF8B;
+  background: #6dff8f;
+  border-radius: 10px;
 }
 
-/* trunk (always centered under leaves now) */
-.trunk {
-  width: 18px;
-  height: 60px;
-  background: #8b5a2b;
-  margin: -10px auto 0;
+/* spread leaves like a cute plant blob */
+.l1 { top: 10px; left: 45px; transform: rotate(0deg); }
+.l2 { top: 25px; left: 10px; transform: rotate(-35deg); background:#5ae67c; }
+.l3 { top: 25px; right: 10px; transform: rotate(35deg); background:#5ae67c; }
+.l4 { bottom: 10px; left: 40px; transform: rotate(180deg); background:#4fd96e; }
+.l5 { top: 0px; left: 40px; transform: rotate(10deg); background:#7cff9b; }
+
+/* animations */
+@keyframes sway {
+  0% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+  100% { transform: rotate(-2deg); }
 }
 
-/* pot */
+@keyframes panic {
+  0% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+  100% { transform: rotate(-6deg); }
+}
+
+.normal { animation: sway 2.5s infinite; transform-origin: bottom center; }
+.stressed { animation: panic 0.25s infinite; transform-origin: bottom center; }
+
+/* ===== POT (cute pixel face style) ===== */
 #pot {
-  width: 90px;
-  height: 40px;
-  background: #d9a066;
+  width: 110px;
+  height: 80px;
+  background: linear-gradient(#e6b27a, #c98b4e);
   border: 3px solid #000;
-  margin-top: 6px;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: inset -6px -6px 0 rgba(0,0,0,0.15);
+}
+
+/* eyes */
+.eye {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #000;
+  top: 28px;
+  border-radius: 2px;
+}
+
+.eye.left { left: 30px; }
+.eye.right { right: 30px; }
+
+/* smile */
+.mouth {
+  position: absolute;
+  width: 20px;
+  height: 8px;
+  border-bottom: 3px solid #000;
+  border-radius: 0 0 10px 10px;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 /* ===== WATER BAR ===== */
