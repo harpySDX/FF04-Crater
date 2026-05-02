@@ -14,32 +14,15 @@ body {
   background: #ffd6ec;
   font-family: "Press Start 2P", monospace;
   image-rendering: pixelated;
-
-  <div id="plant">
-  <div id="succulent" class="normal">
-    <div class="leaf l1"></div>
-    <div class="leaf l2"></div>
-    <div class="leaf l3"></div>
-    <div class="leaf l4"></div>
-    <div class="leaf l5"></div>
-  </div>
-
-  <div id="pot">
-    <div class="eye left"></div>
-    <div class="eye right"></div>
-    <div class="mouth"></div>
-  </div>
-</div>
 }
 
-/* layout */
 #game {
   width: 100vw;
   height: 100vh;
   position: relative;
 }
 
-/* score */
+/* SCORE */
 #score {
   position: absolute;
   top: 18px;
@@ -47,7 +30,7 @@ body {
   font-size: 12px;
 }
 
-/* CENTER PLANT */
+/* CENTER */
 #plant {
   position: absolute;
   left: 50%;
@@ -63,10 +46,9 @@ body {
   position: relative;
   width: 160px;
   height: 120px;
-  margin-bottom: -10px; /* overlap pot */
+  margin-bottom: -10px;
 }
 
-/* leaves (big rosette, slightly bigger than pot) */
 .leaf {
   position: absolute;
   width: 70px;
@@ -75,12 +57,11 @@ body {
   border-radius: 10px;
 }
 
-/* spread leaves like a cute plant blob */
-.l1 { top: 10px; left: 45px; transform: rotate(0deg); }
+.l1 { top: 10px; left: 45px; }
 .l2 { top: 25px; left: 10px; transform: rotate(-35deg); background:#5ae67c; }
 .l3 { top: 25px; right: 10px; transform: rotate(35deg); background:#5ae67c; }
 .l4 { bottom: 10px; left: 40px; transform: rotate(180deg); background:#4fd96e; }
-.l5 { top: 0px; left: 40px; transform: rotate(10deg); background:#7cff9b; }
+.l5 { top: 0px; left: 40px; background:#7cff9b; }
 
 /* animations */
 @keyframes sway {
@@ -98,7 +79,7 @@ body {
 .normal { animation: sway 2.5s infinite; transform-origin: bottom center; }
 .stressed { animation: panic 0.25s infinite; transform-origin: bottom center; }
 
-/* ===== POT (cute pixel face style) ===== */
+/* ===== POT ===== */
 #pot {
   width: 110px;
   height: 80px;
@@ -109,7 +90,7 @@ body {
   box-shadow: inset -6px -6px 0 rgba(0,0,0,0.15);
 }
 
-/* eyes */
+/* face */
 .eye {
   position: absolute;
   width: 8px;
@@ -122,7 +103,6 @@ body {
 .eye.left { left: 30px; }
 .eye.right { right: 30px; }
 
-/* smile */
 .mouth {
   position: absolute;
   width: 20px;
@@ -134,7 +114,7 @@ body {
   transform: translateX(-50%);
 }
 
-/* ===== WATER BAR ===== */
+/* WATER BAR */
 #barWrap {
   position: absolute;
   right: calc(50% - 240px);
@@ -146,19 +126,6 @@ body {
   background: #fff;
 }
 
-#barWrap::before,
-#barWrap::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 20%;
-  left: 0;
-  background: #ff4d4d;
-}
-
-#barWrap::before { top: 0; }
-#barWrap::after { bottom: 0; }
-
 #barFill {
   position: absolute;
   bottom: 0;
@@ -167,7 +134,7 @@ body {
   background: #3cc7ff;
 }
 
-/* button */
+/* BUTTON */
 #waterBtn {
   position: absolute;
   bottom: 30px;
@@ -181,7 +148,7 @@ body {
   cursor: pointer;
 }
 
-/* game over */
+/* GAME OVER */
 #gameOver {
   position: absolute;
   inset: 0;
@@ -192,25 +159,6 @@ body {
   background: rgba(0,0,0,0.7);
   color: #fff;
 }
-
-/* animations */
-@keyframes sway {
-  0% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
-  100% { transform: rotate(-2deg); }
-}
-
-@keyframes panic {
-  0% { transform: rotate(-6deg); }
-  50% { transform: rotate(6deg); }
-  100% { transform: rotate(-6deg); }
-}
-
-.normal { animation: sway 2.5s infinite; }
-.stressed { animation: panic 0.3s infinite; }
-
-#tree.normal { transform-origin: bottom center; }
-#tree.stressed { transform-origin: bottom center; }
 </style>
 </head>
 
@@ -220,11 +168,19 @@ body {
   <div id="score">Score: 0</div>
 
   <div id="plant">
-    <div id="tree" class="normal">
-      <div class="leaves"></div>
-      <div class="trunk"></div>
+    <div id="succulent" class="normal">
+      <div class="leaf l1"></div>
+      <div class="leaf l2"></div>
+      <div class="leaf l3"></div>
+      <div class="leaf l4"></div>
+      <div class="leaf l5"></div>
     </div>
-    <div id="pot"></div>
+
+    <div id="pot">
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="mouth"></div>
+    </div>
   </div>
 
   <div id="barWrap">
@@ -246,7 +202,7 @@ let score = 0;
 let alive = true;
 
 const bar = document.getElementById("barFill");
-const tree = document.getElementById("tree");
+const plant = document.getElementById("succulent");
 const scoreEl = document.getElementById("score");
 const gameOver = document.getElementById("gameOver");
 const finalScore = document.getElementById("finalScore");
@@ -255,11 +211,11 @@ function update() {
   bar.style.height = water + "%";
 
   if (water < 20 || water > 80) {
-    tree.classList.add("stressed");
-    tree.classList.remove("normal");
+    plant.classList.add("stressed");
+    plant.classList.remove("normal");
   } else {
-    tree.classList.add("normal");
-    tree.classList.remove("stressed");
+    plant.classList.add("normal");
+    plant.classList.remove("stressed");
   }
 
   if (water <= 0 || water >= 100) {
