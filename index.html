@@ -3,37 +3,39 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Pixel Plant Care 🌱</title>
+<title>Pixel Plant 🌱</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 body {
   margin: 0;
-  background: linear-gradient(135deg, #ffd6ec, #d6f7ff);
-  font-family: 'Press Start 2P', monospace;
   overflow: hidden;
-  color: #333;
+  background: #ffdff1; /* pastel solid */
+  font-family: "Press Start 2P", monospace;
+  image-rendering: pixelated;
 }
 
+/* --- GAME WRAPPER --- */
 #game {
-  position: relative;
   width: 100vw;
   height: 100vh;
+  position: relative;
 }
 
-/* Score */
+/* SCORE */
 #score {
   position: absolute;
   top: 20px;
   left: 20px;
-  font-size: 14px;
-  background: rgba(255,255,255,0.6);
+  font-size: 12px;
   padding: 10px;
-  border-radius: 10px;
+  background: #fff;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
 }
 
-/* Plant */
+/* --- TREE (PIXEL ART) --- */
 #plant {
   position: absolute;
   left: 50%;
@@ -43,66 +45,80 @@ body {
   text-align: center;
 }
 
-.stem {
-  width: 12px;
-  height: 80px;
-  background: #4caf50;
+/* pixel tree built from tiny squares */
+.tree {
+  width: 0;
+  height: 0;
   margin: 0 auto;
-  border-radius: 2px;
+  position: relative;
+  transform-origin: bottom center;
+  transition: transform 0.2s;
 }
 
-.leaf {
-  width: 60px;
-  height: 60px;
-  background: #8aff9a;
-  border-radius: 50%;
-  margin: -40px auto 0 auto;
-  box-shadow: 0 0 0 6px #6ee07b inset;
+/* trunk + leaves via pixel blocks */
+.tree::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background:
+    /* leaves */
+    linear-gradient(#7CFF8B, #7CFF8B) 0 0/20px 20px,
+    linear-gradient(#7CFF8B, #7CFF8B) 20px 0/20px 20px,
+    linear-gradient(#7CFF8B, #7CFF8B) -20px 0/20px 20px,
+    linear-gradient(#7CFF8B, #7CFF8B) 0 -20px/20px 20px,
+
+    /* trunk */
+    linear-gradient(#8b5a2b, #8b5a2b) 0 20px/20px 40px;
 }
 
+/* pot */
 .pot {
-  width: 80px;
-  height: 50px;
+  width: 60px;
+  height: 30px;
+  margin: 10px auto 0;
   background: #d9a066;
-  margin: 10px auto 0 auto;
-  border-radius: 0 0 10px 10px;
+  border: 3px solid #000;
+  box-shadow: 3px 3px 0 #000;
 }
 
-/* Water bar */
+/* --- WATER BAR (PIXEL SEGMENTS) --- */
 #waterContainer {
   position: absolute;
   right: 40px;
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 300px;
-  background: rgba(255,255,255,0.5);
-  border: 3px solid #444;
-  border-radius: 10px;
-  overflow: hidden;
+  width: 60px;
+  height: 320px;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 3px;
 }
 
-#water {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 50%;
-  background: linear-gradient(#4dd0ff, #1e90ff);
-  transition: height 0.1s linear;
+.segment {
+  flex: 1;
+  background: #fff;
+  border: 2px solid #000;
 }
 
-/* Buttons */
+.segment.on {
+  background: #3cc7ff;
+}
+
+/* --- BUTTON --- */
 #waterBtn {
   position: absolute;
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 15px 25px;
+  padding: 12px 18px;
   font-family: inherit;
-  font-size: 12px;
+  font-size: 10px;
   background: #fff;
-  border: 3px solid #444;
-  border-radius: 10px;
+  border: 3px solid #000;
+  box-shadow: 4px 4px 0 #000;
   cursor: pointer;
 }
 
@@ -110,7 +126,7 @@ body {
   transform: translateX(-50%) scale(0.95);
 }
 
-/* Game over */
+/* --- GAME OVER --- */
 #gameOver {
   position: absolute;
   inset: 0;
@@ -120,110 +136,137 @@ body {
   flex-direction: column;
   background: rgba(0,0,0,0.6);
   color: white;
-  text-align: center;
 }
 
 #restart {
   margin-top: 20px;
-  padding: 10px 20px;
+  padding: 10px;
   font-family: inherit;
-  border: none;
+  border: 2px solid #000;
   cursor: pointer;
-  background: white;
+}
+
+/* --- TREE ANIMATIONS --- */
+@keyframes sway {
+  0% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+  100% { transform: rotate(-2deg); }
+}
+
+@keyframes panic {
+  0% { transform: rotate(-6deg) scale(0.98); }
+  50% { transform: rotate(6deg) scale(1.02); }
+  100% { transform: rotate(-6deg) scale(0.98); }
+}
+
+.tree.normal {
+  animation: sway 2.5s infinite ease-in-out;
+}
+
+.tree.stressed {
+  animation: panic 0.4s infinite;
 }
 </style>
 </head>
 
 <body>
-<div id="game">
 
+<div id="game">
   <div id="score">Score: 0</div>
 
   <div id="plant">
-    <div class="leaf"></div>
-    <div class="stem"></div>
+    <div class="tree normal" id="tree"></div>
     <div class="pot"></div>
   </div>
 
-  <div id="waterContainer">
-    <div id="water"></div>
-  </div>
+  <div id="waterContainer"></div>
 
   <button id="waterBtn">WATER (SPACE)</button>
 
   <div id="gameOver">
-    <h1>💀 Plant Died</h1>
+    <h1>💀 DEAD PLANT</h1>
     <div id="finalScore"></div>
-    <button id="restart">Restart</button>
+    <button id="restart">RESTART</button>
   </div>
-
 </div>
 
 <script>
-let water = 50;
+let water = 6;
 let score = 0;
 let alive = true;
 
-const waterEl = document.getElementById("water");
+const waterBar = document.getElementById("waterContainer");
 const scoreEl = document.getElementById("score");
-const gameOverEl = document.getElementById("gameOver");
-const finalScoreEl = document.getElementById("finalScore");
+const tree = document.getElementById("tree");
+const gameOver = document.getElementById("gameOver");
+const finalScore = document.getElementById("finalScore");
 
-function updateWater() {
-  waterEl.style.height = water + "%";
+/* build pixel bar */
+const segments = 12;
+for (let i = 0; i < segments; i++) {
+  const seg = document.createElement("div");
+  seg.className = "segment";
+  waterBar.appendChild(seg);
+}
 
-  // death conditions
-  if (water <= 0 || water >= 100) {
+function renderWater() {
+  const segs = document.querySelectorAll(".segment");
+
+  segs.forEach((s, i) => {
+    if (i < water) s.classList.add("on");
+    else s.classList.remove("on");
+  });
+
+  // tree state
+  if (water <= 2 || water >= 10) {
+    tree.classList.remove("normal");
+    tree.classList.add("stressed");
+  } else {
+    tree.classList.remove("stressed");
+    tree.classList.add("normal");
+  }
+
+  if (water <= 0 || water >= segments) {
     endGame();
   }
 }
 
-function endGame() {
-  alive = false;
-  gameOverEl.style.display = "flex";
-  finalScoreEl.innerText = "Final Score: " + score;
-}
-
 function waterPlant() {
   if (!alive) return;
-  water += 12;
-  if (water > 100) water = 100;
-  updateWater();
+  water += 2;
+  if (water > segments) water = segments;
+  renderWater();
 }
 
 document.getElementById("waterBtn").onclick = waterPlant;
 
 document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") {
-    waterPlant();
-  }
+  if (e.code === "Space") waterPlant();
 });
 
-document.getElementById("restart").onclick = () => {
-  location.reload();
-};
+function endGame() {
+  alive = false;
+  gameOver.style.display = "flex";
+  finalScore.innerText = "Score: " + score;
+}
 
-// game loop
+document.getElementById("restart").onclick = () => location.reload();
+
+/* game loop */
 setInterval(() => {
   if (!alive) return;
 
-  // drain with randomness
-  let drain = 1 + Math.random() * 2.5;
+  let drain = 0.4 + Math.random() * 0.6;
   water -= drain;
-
-  // occasional fluctuation spikes
-  if (Math.random() < 0.05) {
-    water -= 5;
-  }
-
-  updateWater();
 
   score++;
   scoreEl.innerText = "Score: " + score;
 
-}, 100);
+  renderWater();
+}, 150);
 
-updateWater();
+renderWater();
 </script>
+
 </body>
 </html>
