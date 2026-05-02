@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Pixel Plant 🌱</title>
+<title>Pixel Plant Core 🌱</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -11,12 +11,12 @@
 body {
   margin: 0;
   overflow: hidden;
-  background: #ffdff1; /* pastel solid */
+  background: #ffd6ec; /* solid pastel, no gradient */
   font-family: "Press Start 2P", monospace;
   image-rendering: pixelated;
 }
 
-/* --- GAME WRAPPER --- */
+/* ===== GAME LAYOUT ===== */
 #game {
   width: 100vw;
   height: 100vh;
@@ -29,95 +29,120 @@ body {
   top: 20px;
   left: 20px;
   font-size: 12px;
-  padding: 10px;
   background: #fff;
-  border: 3px solid #000;
+  border: 4px solid #000;
+  padding: 10px;
   box-shadow: 4px 4px 0 #000;
 }
 
-/* --- TREE (PIXEL ART) --- */
+/* ===== CENTER PLANT ===== */
 #plant {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  image-rendering: pixelated;
   text-align: center;
 }
 
-/* pixel tree built from tiny squares */
-.tree {
-  width: 0;
-  height: 0;
+/* BIG PIXEL TREE */
+#tree {
+  width: 160px;
+  height: 220px;
   margin: 0 auto;
   position: relative;
   transform-origin: bottom center;
-  transition: transform 0.2s;
 }
 
-/* trunk + leaves via pixel blocks */
-.tree::before {
+/* pixel trunk */
+#tree::before {
   content: "";
   position: absolute;
-  left: -10px;
+  left: 50%;
   bottom: 0;
-  width: 20px;
-  height: 20px;
-  background:
-    /* leaves */
-    linear-gradient(#7CFF8B, #7CFF8B) 0 0/20px 20px,
-    linear-gradient(#7CFF8B, #7CFF8B) 20px 0/20px 20px,
-    linear-gradient(#7CFF8B, #7CFF8B) -20px 0/20px 20px,
-    linear-gradient(#7CFF8B, #7CFF8B) 0 -20px/20px 20px,
-
-    /* trunk */
-    linear-gradient(#8b5a2b, #8b5a2b) 0 20px/20px 40px;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 90px;
+  background: #8b5a2b;
+  box-shadow:
+    -24px -30px 0 0 #7CFF8B,
+     24px -30px 0 0 #7CFF8B,
+      0px -60px 0 0 #7CFF8B,
+    -48px 0px 0 0 #7CFF8B,
+     48px 0px 0 0 #7CFF8B;
 }
 
 /* pot */
-.pot {
-  width: 60px;
-  height: 30px;
+#pot {
+  width: 120px;
+  height: 50px;
   margin: 10px auto 0;
   background: #d9a066;
-  border: 3px solid #000;
-  box-shadow: 3px 3px 0 #000;
+  border: 4px solid #000;
+  box-shadow: 4px 4px 0 #000;
 }
 
-/* --- WATER BAR (PIXEL SEGMENTS) --- */
-#waterContainer {
+/* ===== WATER BAR (PIXEL ART SINGLE BAR) ===== */
+#barWrap {
   position: absolute;
-  right: 40px;
+  right: 60px;
   top: 50%;
   transform: translateY(-50%);
   width: 60px;
-  height: 320px;
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 3px;
-}
-
-.segment {
-  flex: 1;
+  height: 340px;
+  border: 5px solid #000;
   background: #fff;
-  border: 2px solid #000;
+  position: relative;
 }
 
-.segment.on {
+/* red danger zones */
+#barWrap::before,
+#barWrap::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 18%;
+  background: #ff4d4d;
+  z-index: 0;
+}
+
+#barWrap::before { top: 0; }
+#barWrap::after { bottom: 0; }
+
+/* fill */
+#barFill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 50%;
   background: #3cc7ff;
+  z-index: 1;
+  transition: height 0.08s linear;
 }
 
-/* --- BUTTON --- */
+/* inner pixel grid overlay */
+#barGrid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(#000 1px, transparent 1px),
+    linear-gradient(90deg, #000 1px, transparent 1px);
+  background-size: 10px 10px;
+  opacity: 0.15;
+  z-index: 2;
+}
+
+/* ===== BUTTON ===== */
 #waterBtn {
   position: absolute;
   bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 12px 18px;
   font-family: inherit;
   font-size: 10px;
+  padding: 14px 20px;
   background: #fff;
-  border: 3px solid #000;
+  border: 4px solid #000;
   box-shadow: 4px 4px 0 #000;
   cursor: pointer;
 }
@@ -126,7 +151,7 @@ body {
   transform: translateX(-50%) scale(0.95);
 }
 
-/* --- GAME OVER --- */
+/* ===== GAME OVER ===== */
 #gameOver {
   position: absolute;
   inset: 0;
@@ -134,37 +159,36 @@ body {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  background: rgba(0,0,0,0.6);
-  color: white;
+  background: rgba(0,0,0,0.7);
+  color: #fff;
 }
 
 #restart {
   margin-top: 20px;
   padding: 10px;
   font-family: inherit;
-  border: 2px solid #000;
-  cursor: pointer;
+  border: 3px solid #000;
 }
 
-/* --- TREE ANIMATIONS --- */
+/* ===== ANIMATIONS ===== */
 @keyframes sway {
-  0% { transform: rotate(-2deg); }
-  50% { transform: rotate(2deg); }
-  100% { transform: rotate(-2deg); }
+  0% { transform: translate(-50%, -50%) rotate(-2deg); }
+  50% { transform: translate(-50%, -50%) rotate(2deg); }
+  100% { transform: translate(-50%, -50%) rotate(-2deg); }
 }
 
 @keyframes panic {
-  0% { transform: rotate(-6deg) scale(0.98); }
-  50% { transform: rotate(6deg) scale(1.02); }
-  100% { transform: rotate(-6deg) scale(0.98); }
+  0% { transform: translate(-50%, -50%) rotate(-6deg); }
+  50% { transform: translate(-50%, -50%) rotate(6deg); }
+  100% { transform: translate(-50%, -50%) rotate(-6deg); }
 }
 
-.tree.normal {
-  animation: sway 2.5s infinite ease-in-out;
+.normal {
+  animation: sway 2.5s infinite;
 }
 
-.tree.stressed {
-  animation: panic 0.4s infinite;
+.stressed {
+  animation: panic 0.35s infinite;
 }
 </style>
 </head>
@@ -172,53 +196,45 @@ body {
 <body>
 
 <div id="game">
+
   <div id="score">Score: 0</div>
 
   <div id="plant">
-    <div class="tree normal" id="tree"></div>
-    <div class="pot"></div>
+    <div id="tree" class="normal"></div>
+    <div id="pot"></div>
   </div>
 
-  <div id="waterContainer"></div>
+  <div id="barWrap">
+    <div id="barFill"></div>
+    <div id="barGrid"></div>
+  </div>
 
   <button id="waterBtn">WATER (SPACE)</button>
 
   <div id="gameOver">
-    <h1>💀 DEAD PLANT</h1>
+    <h1>💀 PLANT DIED</h1>
     <div id="finalScore"></div>
     <button id="restart">RESTART</button>
   </div>
+
 </div>
 
 <script>
-let water = 6;
+let water = 50;
 let score = 0;
 let alive = true;
 
-const waterBar = document.getElementById("waterContainer");
-const scoreEl = document.getElementById("score");
+const bar = document.getElementById("barFill");
 const tree = document.getElementById("tree");
+const scoreEl = document.getElementById("score");
 const gameOver = document.getElementById("gameOver");
 const finalScore = document.getElementById("finalScore");
 
-/* build pixel bar */
-const segments = 12;
-for (let i = 0; i < segments; i++) {
-  const seg = document.createElement("div");
-  seg.className = "segment";
-  waterBar.appendChild(seg);
-}
+function update() {
+  bar.style.height = water + "%";
 
-function renderWater() {
-  const segs = document.querySelectorAll(".segment");
-
-  segs.forEach((s, i) => {
-    if (i < water) s.classList.add("on");
-    else s.classList.remove("on");
-  });
-
-  // tree state
-  if (water <= 2 || water >= 10) {
+  // danger zones (top + bottom red)
+  if (water <= 18 || water >= 82) {
     tree.classList.remove("normal");
     tree.classList.add("stressed");
   } else {
@@ -226,46 +242,46 @@ function renderWater() {
     tree.classList.add("normal");
   }
 
-  if (water <= 0 || water >= segments) {
-    endGame();
+  if (water <= 0 || water >= 100) {
+    die();
   }
 }
 
 function waterPlant() {
   if (!alive) return;
-  water += 2;
-  if (water > segments) water = segments;
-  renderWater();
+  water += 10;
+  if (water > 100) water = 100;
+  update();
 }
 
-document.getElementById("waterBtn").onclick = waterPlant;
-
-document.addEventListener("keydown", (e) => {
-  if (e.code === "Space") waterPlant();
-});
-
-function endGame() {
+function die() {
   alive = false;
   gameOver.style.display = "flex";
   finalScore.innerText = "Score: " + score;
 }
 
+document.getElementById("waterBtn").onclick = waterPlant;
+
+document.addEventListener("keydown", e => {
+  if (e.code === "Space") waterPlant();
+});
+
 document.getElementById("restart").onclick = () => location.reload();
 
-/* game loop */
+/* main loop */
 setInterval(() => {
   if (!alive) return;
 
-  let drain = 0.4 + Math.random() * 0.6;
+  let drain = 0.6 + Math.random() * 0.8;
   water -= drain;
 
   score++;
   scoreEl.innerText = "Score: " + score;
 
-  renderWater();
-}, 150);
+  update();
+}, 120);
 
-renderWater();
+update();
 </script>
 
 </body>
